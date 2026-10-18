@@ -56,7 +56,7 @@ __Solamente HU-1 y HU-2 por el momento__
 
 
 
-**Objetivos transversales**
+### Objetivos transversales
 - Emplear al menos una interfaces o clase adaptadores.
 - Emplear la arquitectura Modelo-Vista-Controlador en el código fuente.
 - Documentar el código fuente usando Javadoc.
