@@ -1,8 +1,6 @@
 ### Por el momento
 __Solamente HU-1 y HU-2 por el momento__
 - Hacer fxml del juego principal con cuadricula y botones básicos (sin diseño aún)
-- Hacer fxml de la ventana de inicio
-- Ventana de inicio de juego (con ventana de confirmación -Eso lo vimos en clase con craps-)
 
 
 <br>
@@ -22,8 +20,8 @@ __Solamente HU-1 y HU-2 por el momento__
 
 
 **HU-2 Inicio del juego**
-- El usuario puede iniciar el juego en el momento que lo desee haciendo clic en un botón.
-- El usuario debe aceptar el inicio de un nuevo juego (alerta de confirmación).
+~~- El usuario puede iniciar el juego en el momento que lo desee haciendo clic en un botón.~~
+~~- El usuario debe aceptar el inicio de un nuevo juego (alerta de confirmación).~~
 - la cuadricula de 6x6 debe rellenarse en cada bloque de 2x3 con 2 números verificando que los números ingresados en cada fila, columna y bloque de 2x3 no se repitan (Validar que el tablero sea válido).
 <br>
 
@@ -57,7 +55,7 @@ __Solamente HU-1 y HU-2 por el momento__
 
 
 ### Objetivos transversales
-- Emplear al menos una interfaces o clase adaptadores.
+~~- Emplear al menos una interfaces o clase adaptadores.~~
 - Emplear la arquitectura Modelo-Vista-Controlador en el código fuente.
 - Documentar el código fuente usando Javadoc.
 - Se deben evidenciar al menos 2 Pull Request y 2 commits por estudiante.
