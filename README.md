@@ -1,6 +1,8 @@
 ### Por el momento
 __Solamente HU-1 y HU-2 por el momento__
-- Hacer fxml del juego principal con cuadricula y botones básicos (sin diseño aún)
+- fxml con cuadricula, botones y controles etiquetados. Atractivo, coherente, paleta de colores adecuada (UX y UI)
+- la cuadricula de 6x6 debe rellenarse en cada bloque de 2x3 con 2 números verificando que los números 
+ingresados en cada fila, columna y bloque de 2x3 no se repitan (Validar que el tablero sea válido).
 
 
 <br>
