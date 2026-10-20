@@ -25,15 +25,15 @@
                   <Insets bottom="-5.0" right="10.0" />
                </VBox.margin>
             </ImageView>
-            <Button fx:id="StartGameButton" mnemonicParsing="false" onAction="#enterGame" prefHeight="45.0" prefWidth="164.0" style="-fx-border-color: black; -fx-border-radius: 10; -fx-background-color: #D3D3D3;" text="Start Game" textOverrun="LEADING_WORD_ELLIPSIS">
+            <Button fx:id="StartGameButton" mnemonicParsing="false" onAction="#enterGame" prefHeight="53.0" prefWidth="164.0" style="-fx-border-radius: 20; -fx-background-radius: 20; -fx-border-color: #2F4F4F;" text="Start Game" textOverrun="LEADING_WORD_ELLIPSIS">
                <font>
                   <Font name="Noto Sans Bold" size="20.0" />
                </font>
                <VBox.margin>
-                  <Insets bottom="15.0" />
+                  <Insets bottom="20.0" />
                </VBox.margin>
             </Button>
-            <Button fx:id="ExitGameButton" mnemonicParsing="false" onAction="#exitGame" prefHeight="43.0" prefWidth="96.0" style="-fx-border-color: black; -fx-border-radius: 10; -fx-background-color: #D3D3D3;" text="Exit" textOverrun="LEADING_WORD_ELLIPSIS">
+            <Button fx:id="ExitGameButton" mnemonicParsing="false" onAction="#exitGame" prefHeight="49.0" prefWidth="96.0" style="-fx-border-radius: 20; -fx-background-radius: 20; -fx-border-color: #2F4F4F;" text="Exit" textOverrun="LEADING_WORD_ELLIPSIS">
                <font>
                   <Font name="Noto Sans Bold" size="19.0" />
                </font>

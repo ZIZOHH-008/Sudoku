@@ -55,7 +55,7 @@
                   <ImageView fx:id="dado2ImageView" fitHeight="100.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true" />
                </children>
             </HBox>
-            <Button fx:id="LanzarButton" mnemonicParsing="false" onMouseClicked="#OnMouseClicked" text="Lanzar" />
+            <Button fx:id="LanzarButton" mnemonicParsing="false" text="Lanzar" />
          </children>
       </VBox>
       <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="30.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
