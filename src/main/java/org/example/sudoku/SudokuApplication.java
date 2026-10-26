@@ -7,7 +7,10 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+
+
 public class SudokuApplication extends Application {
+
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(SudokuApplication.class.getResource("welcome-view.fxml"));
@@ -19,4 +22,5 @@ public class SudokuApplication extends Application {
         stage.sizeToScene(); // Ajusta la ventana al contenido del root
         stage.show();
     }
+
 }
