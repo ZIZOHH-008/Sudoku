@@ -44,6 +44,7 @@ public class WelcomeController implements IGameLog {
 
             stage.setScene(scene);
             stage.show();
+            
         }
 
         else{
