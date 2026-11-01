@@ -1,12 +1,13 @@
 package org.example.sudoku.controllers;
 
-
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.GridPane;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import org.example.sudoku.models.IGameLog;
 
 import java.util.ArrayList;
@@ -14,114 +15,109 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-
-
-/* NOTAS TEMPORALES PARA ENTENDER LA LÓGICA DEL CÓDIGO
-- cell.getText()  - es lo que tiene la celda
-- getControlNewText()  -  el valor que va a tener la celda (si es válido)
-*/
-
-
+/**
+ * Controlador principal del juego Sudoku (6x6).
+ * Administra la creación de la cuadrícula, interacción de botones y lógica de tablero.
+ */
 public class GameController implements IGameLog {
-    @FXML private GridPane sudokuGrid;
+
+    @FXML
+    private GridPane sudokuGrid;
+
     private final TextField[][] cells = new TextField[6][6];
     private final Random random = new Random();
 
-
     @FXML
     public void initialize() {
-        // Remove constraints that may cause the cells to spread out
+        // Eliminar restricciones que causen distorsión en la cuadrícula
         sudokuGrid.getColumnConstraints().clear();
         sudokuGrid.getRowConstraints().clear();
 
-        // Remove spacing between cells
+        // Configuración de espaciado y relleno del contenedor
         sudokuGrid.setHgap(0);
         sudokuGrid.setVgap(0);
         sudokuGrid.setPadding(Insets.EMPTY);
 
-        // Keep the board at 420 x 420 pixels
+        // Mantener el tamaño exacto del tablero en 420 x 420 píxeles
         sudokuGrid.setMinSize(420, 420);
         sudokuGrid.setPrefSize(420, 420);
         sudokuGrid.setMaxSize(420, 420);
 
-        // Center the cells within the board
+        // Centrar la cuadrícula dentro de la escena
         sudokuGrid.setAlignment(Pos.CENTER);
 
-        // Create the 36 cells
+        // Crear dinámicamente las 36 celdas
         for (int row = 0; row < 6; row++) {
             for (int column = 0; column < 6; column++) {
 
                 TextField cell = new TextField();
-                configureCell(cell); //method below of this one
+                configureCell(cell); // Filtro para restringir entradas de 1 a 6
 
-                //The alert only appears when the user presses Enter after typing
+                // Registrar evento al presionar Enter en una celda
                 cell.setOnAction(event -> {
                     String number = cell.getText();
                     logEvent("Entered number: " + number);
                 });
 
-                // Store the cell in the matrix
+                // Guardar la celda en la matriz interna
                 cells[row][column] = cell;
 
-                // Set a fixed size for all cells
+                // Tamaño fijo para todas las celdas (70x70 px)
                 cell.setPrefSize(70, 70);
                 cell.setMinSize(70, 70);
                 cell.setMaxSize(70, 70);
 
-                // Center the content
+                // Centrar el contenido de la celda
                 cell.setAlignment(Pos.CENTER);
 
-                // Calculate the border thickness
+                // Cálculo exacto de grosores de borde para separar bloques 2x3 (UI/UX)
                 int top = (row == 0) ? 2 : 0;
-                int right = (column == 5) ? 2 :
-                        (column == 2) ? 2 : 1;
-                int bottom = (row == 5) ? 2 :
-                        (row == 1 || row == 3) ? 2 : 1;
+                int right = (column == 5 || column == 2) ? 2 : 1;
+                int bottom = (row == 5 || row == 1 || row == 3) ? 2 : 1;
                 int left = (column == 0) ? 2 : 0;
 
-                // Apply styling to the cell
+                // Aplicar estilo limpio de bordes directamente en la celda
                 cell.setStyle(
                         "-fx-background-color: white;" +
                                 "-fx-background-insets: 0;" +
                                 "-fx-background-radius: 0;" +
                                 "-fx-border-color: #52677F;" +
-                                "-fx-border-width: " + top + " " +
-                                right + " " + bottom + " " + left + ";" +
+                                "-fx-border-width: " + top + " " + right + " " + bottom + " " + left + ";" +
                                 "-fx-border-insets: 0;" +
                                 "-fx-border-radius: 0;" +
-                                "-fx-font-size: 18px;"
+                                "-fx-font-size: 20px;" +
+                                "-fx-font-weight: bold;"
                 );
 
-                // Add the cell to the GridPane
+                // Agregar la celda al GridPane
                 sudokuGrid.add(cell, column, row);
             }
         }
 
+        // Generar los números iniciales del tablero de Sudoku
         generateInitialBoard();
     }
 
-
     private boolean isValid(int[][] board, int row, int column, int number) {
-
-        // Check that the number does not repeat in the row
+        // Verificar repetición en la fila
         for (int c = 0; c < 6; c++) {
             if (board[row][c] == number) {
                 return false;
             }
         }
 
-        // Check that the number does not repeat in the column
+        // Verificar repetición en la columna
         for (int r = 0; r < 6; r++) {
             if (board[r][column] == number) {
                 return false;
             }
         }
 
-        // Find the starting position of the 2-row by 3-column block
+        // Determinar inicio del bloque de 2x3
         int startRow = (row / 2) * 2;
         int startColumn = (column / 3) * 3;
 
-        // Check that the number does not repeat in that 2x3 block
+        // Verificar repetición dentro del bloque de 2x3
         for (int r = startRow; r < startRow + 2; r++) {
             for (int c = startColumn; c < startColumn + 3; c++) {
                 if (board[r][c] == number) {
@@ -130,135 +126,116 @@ public class GameController implements IGameLog {
             }
         }
 
-        // If no repetition is found, the number is valid
         return true;
     }
 
     private boolean solveSudoku(int[][] board, int position) {
-
-        // If all 36 cells have been processed, the Sudoku is complete
         if (position == 36) {
             return true;
         }
 
-        // Convert the linear position into a row and column
         int row = position / 6;
         int column = position % 6;
 
-        // Prepare the numbers from 1 to 6 in random order
         List<Integer> numbers = new ArrayList<>();
-
-
         for (int number = 1; number <= 6; number++) {
             numbers.add(number);
         }
-
         Collections.shuffle(numbers, random);
 
-
-        // Try placing each number
         for (int number : numbers) {
-
             if (isValid(board, row, column, number)) {
                 board[row][column] = number;
 
-                // Continue with the next cell
                 if (solveSudoku(board, position + 1)) {
                     return true;
                 }
 
-                // If the puzzle cannot be completed, undo this choice
                 board[row][column] = 0;
             }
         }
 
-        // No number worked at this position
         return false;
     }
 
-
     private void generateInitialBoard() {
-
-        // Create a matrix to build the complete solution
         int[][] solution = new int[6][6];
 
-        // Generate a solution that follows all the rules
         if (!solveSudoku(solution, 0)) {
-            throw new IllegalStateException(
-                    "Unable to generate a valid Sudoku."
-            );
+            throw new IllegalStateException("Unable to generate a valid Sudoku.");
         }
 
-        // Clear the 36 cells in the interface
+        // Limpiar todas las celdas
         for (int row = 0; row < 6; row++) {
             for (int column = 0; column < 6; column++) {
                 cells[row][column].clear();
             }
         }
 
-        // Iterate through the six blocks of 2 rows by 3 columns
+        // Colocar 2 números de ayuda por cada bloque de 2x3
         for (int blockRow = 0; blockRow < 6; blockRow += 2) {
             for (int blockColumn = 0; blockColumn < 6; blockColumn += 3) {
-
-                // There are six possible positions in each block
                 List<Integer> positions = new ArrayList<>();
-
                 for (int i = 0; i < 6; i++) {
                     positions.add(i);
                 }
 
-                // Shuffle the positions to select them randomly
                 Collections.shuffle(positions, random);
 
-                // Display two numbers from the solution in this block
                 for (int i = 0; i < 2; i++) {
-
                     int position = positions.get(i);
-
                     int row = blockRow + position / 3;
                     int column = blockColumn + position % 3;
 
-                    cells[row][column].setText(
-                            String.valueOf(solution[row][column])
-                    );
+                    cells[row][column].setText(String.valueOf(solution[row][column]));
                 }
             }
         }
     }
 
-
-
     private void configureCell(TextField cell) {
-    //TextFormatter permite establecer un filtro sobre el contenido de un TextField
-
-        /* === Nota para entender el TextFormatter ===
-        TextFormatter de tipo <String>; su nombre es formatter;
-        change representa el cambio que el usuario intenta realizar en el TextField.
-        La expresión change -> es una expresión lambda.
-        Permite definir qué hacer con cada modificación que se intenta realizar
-        */
-
         TextFormatter<String> formatter = new TextFormatter<>(change -> {
+            String newText = change.getControlNewText();
 
-            String newText = change.getControlNewText(); //Obtains the content that the TextField would have if the change is accepted
-
-            // Allow an empty cell, without this, we cannot delete entries
-            if (newText.isEmpty()) { //borrar contenido de la celda
+            if (newText.isEmpty()) {
                 return change;
             }
 
-            // Allow only numbers from 1 to 6
-            if (newText.matches("[1-6]")) { //Comprueba si el es un digito entre 1 y 6.
-                return change; //Aquí repetía muchas veces las entradas
+            if (newText.matches("[1-6]")) {
+                return change;
             }
 
-            // Reject any other input
             logEvent("Invalid entry");
             return null;
         });
 
         cell.setTextFormatter(formatter);
-        //Assign a textFormatter to the parameter cell
     }
 
+    // Acción para el botón "New Game" en FXML
+    @FXML
+    private void onNewGameClick(ActionEvent event) {
+        generateInitialBoard();
+        showNotification("New Game", "Sudoku Reset", "A new game board has been generated.");
+    }
+
+    // Acción para el botón "Help" en FXML
+    @FXML
+    private void onHelpClick(ActionEvent event) {
+        showNotification("Help", "Hint Request", "Help feature will suggest a valid number for an empty cell.");
+    }
+
+    // Mostrar notificaciones de diálogo
+    private void showNotification(String title, String header, String content) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
+    @Override
+    public void logEvent(String eventMessage) {
+        System.out.println("[LOG]: " + eventMessage);
+    }
 }
