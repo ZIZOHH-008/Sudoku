@@ -17,22 +17,22 @@ __Solamente HU-1 y HU-2 por el momento__
 
   - Crear una interfaz gráfica de usuario intuitiva con aspectos básicos de UX y UI
   - Emplear layouts en la interfaz gráfica de usuario.
-<br>
+<br><br>
 
 
 **HU-2 Inicio del juego**
 - ~~El usuario puede iniciar el juego en el momento que lo desee haciendo clic en un botón.~~
 - ~~El usuario debe aceptar el inicio de un nuevo juego (alerta de confirmación).~~
 - ~~la cuadricula de 6x6 debe rellenarse en cada bloque de 2x3 con 2 números verificando que los números ingresados en cada fila, columna y bloque de 2x3 no se repitan (Validar que el tablero sea válido).~~
-<br>
+<br><br>
 
 
 
-**HU-3 Ingreso de números** - **_Parra_**
-- El usuario puede seleccionar una celda en la cuadrícula de 6x6
-- El usuario puede ingresar un número del 1 al 6 en la celda seleccionada.
-- El usuario puede eliminar un número previamente ingresado para corregir errores.
-- La celda debe permitir la entrada de números únicamente del 1 al 6.
+**HU-3 Ingreso de números**
+- ~~El usuario puede seleccionar una celda en la cuadrícula de 6x6~~
+- ~~El usuario puede ingresar un número del 1 al 6 en la celda seleccionada~~
+- ~~El usuario puede eliminar un número previamente ingresado para corregir errores~~
+- ~~La celda debe permitir la entrada de números únicamente del 1 al 6~~
 <br>
 
 
@@ -42,7 +42,7 @@ __Solamente HU-1 y HU-2 por el momento__
 - El sistema valida que los números ingresados en cada fila, columna y bloque de 2x3 no se repitan. La validación es en tiempo real
 - El sistema detecta y resalta celdas con entradas incorrectas (por ejemplo, con un borde rojo).
 - Se muestra un mensaje de error si el número ingresado viola las reglas del Sudoku.
-<br>
+<br><br>
 
 
 
@@ -51,7 +51,7 @@ __Solamente HU-1 y HU-2 por el momento__
 - El sistema proporciona una sugerencia válida para una celda vacía.
 - La sugerencia debe ser visualmente destacada en la interfaz.
 - No debe ser posible terminar el tablero con el uso de esta ayuda.
-<br>
+<br><br>
 
 
 
