@@ -1,4 +1,4 @@
-### US-4 y US-5
+### US-1, US-4 y US-5
 
 ## _Developers_
 * Brian Rodríguez - 2420014
