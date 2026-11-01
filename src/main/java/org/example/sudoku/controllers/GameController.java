@@ -23,7 +23,7 @@ import java.util.Random;
 
 /**
  * Main Controller for the 6x6 Sudoku Game.
- * Manages grid creation, button interactions, dynamic cell validation, and hint features.
+ * Manages grid creation, button interactions, real-time validation (HU-4), and hint logic (HU-5).
  */
 public class GameController implements IGameLog {
 
@@ -33,7 +33,8 @@ public class GameController implements IGameLog {
     private final TextField[][] cells = new TextField[6][6];
     private final Random random = new Random();
 
-    // Counter for available hints (HU-5 requirement)
+    // Global attributes for solution tracking and hint counter (HU-5)
+    private int[][] solution = new int[6][6];
     private int availableHints = 3;
 
     @FXML
@@ -132,7 +133,7 @@ public class GameController implements IGameLog {
     }
 
     /**
-     * Validates whether placing a value at (row, col) respects Sudoku rules.
+     * Validates whether placing a value at (row, col) respects Sudoku rules in real-time.
      */
     private boolean isValidMove(int row, int col, String value) {
         // 1. Validate Row
@@ -164,6 +165,9 @@ public class GameController implements IGameLog {
         return true; // Valid entry
     }
 
+    /**
+     * Internal backtracking validation for the board solver algorithm.
+     */
     private boolean isValid(int[][] board, int row, int column, int number) {
         // Verify row duplicates
         for (int c = 0; c < 6; c++) {
@@ -195,6 +199,9 @@ public class GameController implements IGameLog {
         return true;
     }
 
+    /**
+     * Recursive solver using backtracking to build a complete Sudoku solution.
+     */
     private boolean solveSudoku(int[][] board, int position) {
         if (position == 36) {
             return true;
@@ -224,8 +231,13 @@ public class GameController implements IGameLog {
         return false;
     }
 
+    /**
+     * Generates a new solved board state and places initial clues.
+     */
     private void generateInitialBoard() {
-        int[][] solution = new int[6][6];
+        // Reset solution matrix and available hints counter
+        solution = new int[6][6];
+        availableHints = 3;
 
         if (!solveSudoku(solution, 0)) {
             throw new IllegalStateException("Unable to generate a valid Sudoku.");
@@ -259,6 +271,9 @@ public class GameController implements IGameLog {
         }
     }
 
+    /**
+     * Restricts inputs in cells to single digits from 1 to 6.
+     */
     private void configureCell(TextField cell) {
         TextFormatter<String> formatter = new TextFormatter<>(change -> {
             String newText = change.getControlNewText();
@@ -281,69 +296,61 @@ public class GameController implements IGameLog {
     // Action handler for "New Game" button in FXML
     @FXML
     private void onNewGameClick(ActionEvent event) {
-        availableHints = 3; // Reset hints count for new game
         generateInitialBoard();
-        showNotification("New Game", "Sudoku Reset", "A new game board has been generated. Hints reset to 3.");
+        showNotification("New Game", "Sudoku Reset", "A new game board has been generated.");
     }
 
-    // Action handler for "Help" button in FXML (HU-5)
+    // Action handler for "Help" button in FXML (HU-5 requirement)
     @FXML
     private void onHelpClick(ActionEvent event) {
-        // 1. Check if hints are still available
+        // 1. Check if the user has available hints left
         if (availableHints <= 0) {
-            showNotification("Help", "No Hints Left", "You have used all your available hints.");
+            showNotification("Help", "No Hints Left", "You have used all your available hints for this game.");
             return;
         }
 
-        // 2. Search for the first empty cell
+        // 2. Search for the first empty cell in the grid
         for (int row = 0; row < 6; row++) {
             for (int column = 0; column < 6; column++) {
                 TextField cell = cells[row][column];
 
                 if (cell.getText().isEmpty()) {
-                    // 3. Find a valid number (1 to 6) for this empty cell
-                    for (int num = 1; num <= 6; num++) {
-                        String value = String.valueOf(num);
+                    // 3. Insert the exact correct value from the solution matrix
+                    cell.setText(String.valueOf(solution[row][column]));
 
-                        if (isValidMove(row, column, value)) {
-                            // Place the suggested value
-                            cell.setText(value);
+                    // 4. Calculate border thickness to preserve original 2x3 block grid layout
+                    int top = (row == 0) ? 2 : 0;
+                    int right = (column == 5 || column == 2) ? 2 : 1;
+                    int bottom = (row == 5 || row == 1 || row == 3) ? 2 : 1;
+                    int left = (column == 0) ? 2 : 0;
 
-                            // Calculate borders to preserve original 2x3 block grid style
-                            int top = (row == 0) ? 2 : 0;
-                            int right = (column == 5 || column == 2) ? 2 : 1;
-                            int bottom = (row == 5 || row == 1 || row == 3) ? 2 : 1;
-                            int left = (column == 0) ? 2 : 0;
+                    // 5. Visually highlight the suggested cell with a soft yellow background
+                    String highlightStyle =
+                            "-fx-background-color: #FFF9C4;" +
+                                    "-fx-background-insets: 0;" +
+                                    "-fx-background-radius: 0;" +
+                                    "-fx-border-color: #1976D2;" +
+                                    "-fx-border-width: " + top + " " + right + " " + bottom + " " + left + ";" +
+                                    "-fx-border-insets: 0;" +
+                                    "-fx-border-radius: 0;" +
+                                    "-fx-font-size: 20px;" +
+                                    "-fx-font-weight: bold;";
 
-                            // Visually highlight the suggested cell (soft yellow background)
-                            String highlightStyle =
-                                    "-fx-background-color: #FFF9C4;" +
-                                            "-fx-background-insets: 0;" +
-                                            "-fx-background-radius: 0;" +
-                                            "-fx-border-color: #1976D2;" +
-                                            "-fx-border-width: " + top + " " + right + " " + bottom + " " + left + ";" +
-                                            "-fx-border-insets: 0;" +
-                                            "-fx-border-radius: 0;" +
-                                            "-fx-font-size: 20px;" +
-                                            "-fx-font-weight: bold;";
+                    cell.setStyle(highlightStyle);
 
-                            cell.setStyle(highlightStyle);
+                    // 6. Decrement remaining hints
+                    availableHints--;
 
-                            // Decrement hint counter
-                            availableHints--;
+                    showNotification("Help", "Hint Provided", "A valid number from the solution was suggested. Remaining hints: " + availableHints);
 
-                            showNotification("Help", "Hint Provided", "A valid number has been suggested. Remaining hints: " + availableHints);
-
-                            // Stop after providing ONE hint
-                            return;
-                        }
-                    }
+                    // Stop execution to provide only ONE hint per button click
+                    return;
                 }
             }
         }
 
-        // If no empty cells were found
-        showNotification("Help", "Board Full", "There are no empty cells left to suggest a move.");
+        // Notify if the board has no empty cells
+        showNotification("Help", "Board Full", "There are no empty cells left to give a hint.");
     }
 
     // Action handler for "Exit" button in FXML returning to welcome view
