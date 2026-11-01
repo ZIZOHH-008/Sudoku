@@ -1,7 +1,8 @@
 ### Por el momento
-__Solamente HU-1 y HU-2 por el momento__
 - HU-1 la hará Brian
-- HU-3 la hará Parra
+- HU-4 la hará Parra
+- Documentar MVC de SudokuGenerator para entender mejor
+- Señalar los lugares donde hemos usado estructuras de datos
 
 
 <br>
@@ -20,6 +21,35 @@ __Solamente HU-1 y HU-2 por el momento__
 <br><br>
 
 
+
+**HU-4 Validación de entradas**
+- El sistema valida que los números ingresados en cada fila, columna y bloque de 2x3 no se repitan. La validación es en tiempo real
+- El sistema detecta y resalta celdas con entradas incorrectas (por ejemplo, con un borde rojo).
+- Se muestra un mensaje de error si el número ingresado viola las reglas del Sudoku.
+  <br><br>
+
+
+
+**HU-5 Opción de ayuda**
+- El usuario puede hacer clic en un botón de "Ayuda" para solicitar una sugerencia (debe ser visible)
+- El sistema proporciona una sugerencia válida para una celda vacía.
+- La sugerencia debe ser visualmente destacada en la interfaz.
+- No debe ser posible terminar el tablero con el uso de esta ayuda.
+  <br><br>
+
+
+
+### Objetivos transversales
+~~- Emplear al menos una interfaces o clase adaptadores.~~
+- Emplear la arquitectura Modelo-Vista-Controlador en el código fuente.
+~~- Implementar una estructura de datos (Tablas, listas, colas – CLAVE)~~
+- Documentar el código fuente usando Javadoc.
+- Se deben evidenciar al menos 2 Pull Request y 2 commits por estudiante.
+  <br><br>
+
+
+
+
 **HU-2 Inicio del juego**
 - ~~El usuario puede iniciar el juego en el momento que lo desee haciendo clic en un botón.~~
 - ~~El usuario debe aceptar el inicio de un nuevo juego (alerta de confirmación).~~
@@ -33,39 +63,11 @@ __Solamente HU-1 y HU-2 por el momento__
 - ~~El usuario puede ingresar un número del 1 al 6 en la celda seleccionada~~
 - ~~El usuario puede eliminar un número previamente ingresado para corregir errores~~
 - ~~La celda debe permitir la entrada de números únicamente del 1 al 6~~
-<br>
-
-
-
-
-**HU-4 Validación de entradas**
-- El sistema valida que los números ingresados en cada fila, columna y bloque de 2x3 no se repitan. La validación es en tiempo real
-- El sistema detecta y resalta celdas con entradas incorrectas (por ejemplo, con un borde rojo).
-- Se muestra un mensaje de error si el número ingresado viola las reglas del Sudoku.
 <br><br>
 
 
 
-**HU-5 Opción de ayuda**
-- El usuario puede hacer clic en un botón de "Ayuda" para solicitar una sugerencia (debe ser visible)
-- El sistema proporciona una sugerencia válida para una celda vacía.
-- La sugerencia debe ser visualmente destacada en la interfaz.
-- No debe ser posible terminar el tablero con el uso de esta ayuda.
-<br><br>
 
-
-
-### Objetivos transversales
-~~- Emplear al menos una interfaces o clase adaptadores.~~
-- Emplear la arquitectura Modelo-Vista-Controlador en el código fuente.
-- Documentar el código fuente usando Javadoc.
-- Se deben evidenciar al menos 2 Pull Request y 2 commits por estudiante.
-- Implementar una estructura de datos (Tablas, listas, colas – CLAVE)
-<br>
-
-
-
-<br>
 
 
 ## _Developers_
