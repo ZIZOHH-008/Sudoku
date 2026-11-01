@@ -2,14 +2,20 @@ package org.example.sudoku.controllers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 import org.example.sudoku.models.IGameLog;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -223,6 +229,22 @@ public class GameController implements IGameLog {
     @FXML
     private void onHelpClick(ActionEvent event) {
         showNotification("Help", "Hint Request", "Help feature will suggest a valid number for an empty cell.");
+    }
+
+    // Acción para el botón "Exit" en FXML para regresar a la vista de bienvenida
+    @FXML
+    private void onExitClick(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/sudoku/welcome-view.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            logEvent("Error returning to welcome view: " + e.getMessage());
+        }
     }
 
     // Mostrar notificaciones de diálogo
