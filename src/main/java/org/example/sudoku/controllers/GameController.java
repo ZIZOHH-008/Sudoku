@@ -3,9 +3,11 @@ package org.example.sudoku.controllers;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.GridPane;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import org.example.sudoku.models.IGameLog;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,12 +16,16 @@ import java.util.Random;
 
 
 
+/* NOTAS TEMPORALES PARA ENTENDER LA LÓGICA DEL CÓDIGO
+- cell.getText()  - es lo que tiene la celda
+- getControlNewText()  -  el valor que va a tener la celda (si es válido)
+*/
 
-public class GameController {
+
+public class GameController implements IGameLog {
     @FXML private GridPane sudokuGrid;
     private final TextField[][] cells = new TextField[6][6];
     private final Random random = new Random();
-
 
 
     @FXML
@@ -46,6 +52,13 @@ public class GameController {
             for (int column = 0; column < 6; column++) {
 
                 TextField cell = new TextField();
+                configureCell(cell); //method below of this one
+
+                //The alert only appears when the user presses Enter after typing
+                cell.setOnAction(event -> {
+                    String number = cell.getText();
+                    logEvent("Entered number: " + number);
+                });
 
                 // Store the cell in the matrix
                 cells[row][column] = cell;
@@ -120,7 +133,6 @@ public class GameController {
         // If no repetition is found, the number is valid
         return true;
     }
-
 
     private boolean solveSudoku(int[][] board, int position) {
 
@@ -213,4 +225,40 @@ public class GameController {
             }
         }
     }
+
+
+
+    private void configureCell(TextField cell) {
+    //TextFormatter permite establecer un filtro sobre el contenido de un TextField
+
+        /* === Nota para entender el TextFormatter ===
+        TextFormatter de tipo <String>; su nombre es formatter;
+        change representa el cambio que el usuario intenta realizar en el TextField.
+        La expresión change -> es una expresión lambda.
+        Permite definir qué hacer con cada modificación que se intenta realizar
+        */
+
+        TextFormatter<String> formatter = new TextFormatter<>(change -> {
+
+            String newText = change.getControlNewText(); //Obtains the content that the TextField would have if the change is accepted
+
+            // Allow an empty cell, without this, we cannot delete entries
+            if (newText.isEmpty()) { //borrar contenido de la celda
+                return change;
+            }
+
+            // Allow only numbers from 1 to 6
+            if (newText.matches("[1-6]")) { //Comprueba si el es un digito entre 1 y 6.
+                return change; //Aquí repetía muchas veces las entradas
+            }
+
+            // Reject any other input
+            logEvent("Invalid entry");
+            return null;
+        });
+
+        cell.setTextFormatter(formatter);
+        //Assign a textFormatter to the parameter cell
+    }
+
 }
