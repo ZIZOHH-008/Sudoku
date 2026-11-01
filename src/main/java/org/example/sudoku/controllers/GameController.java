@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Controlador principal del juego Sudoku (6x6).
- * Administra la creación de la cuadrícula, interacción de botones y lógica de tablero.
+ * Main Controller for the 6x6 Sudoku Game.
+ * Manages grid creation, button interactions, dynamic cell validation, and hint features.
  */
 public class GameController implements IGameLog {
 
@@ -33,57 +33,54 @@ public class GameController implements IGameLog {
     private final TextField[][] cells = new TextField[6][6];
     private final Random random = new Random();
 
+    // Counter for available hints (HU-5 requirement)
+    private int availableHints = 3;
+
     @FXML
     public void initialize() {
-        // Eliminar restricciones que causen distorsión en la cuadrícula
+        // Clear default layout constraints to prevent grid distortion
         sudokuGrid.getColumnConstraints().clear();
         sudokuGrid.getRowConstraints().clear();
 
-        // Configuración de espaciado y relleno del contenedor
+        // Configure spacing and padding for the grid container
         sudokuGrid.setHgap(0);
         sudokuGrid.setVgap(0);
         sudokuGrid.setPadding(Insets.EMPTY);
 
-        // Mantener el tamaño exacto del tablero en 420 x 420 píxeles
+        // Maintain fixed board size of 420x420 pixels
         sudokuGrid.setMinSize(420, 420);
         sudokuGrid.setPrefSize(420, 420);
         sudokuGrid.setMaxSize(420, 420);
 
-        // Centrar la cuadrícula dentro de la escena
+        // Center the grid within the scene layout
         sudokuGrid.setAlignment(Pos.CENTER);
 
-        // Crear dinámicamente las 36 celdas
+        // Dynamically build the 36 cells
         for (int row = 0; row < 6; row++) {
             for (int column = 0; column < 6; column++) {
 
                 TextField cell = new TextField();
-                configureCell(cell); // Filtro para restringir entradas de 1 a 6
+                configureCell(cell); // Input filter restricting numbers from 1 to 6
 
-                // Registrar evento al presionar Enter en una celda
-                cell.setOnAction(event -> {
-                    String number = cell.getText();
-                    logEvent("Entered number: " + number);
-                });
-
-                // Guardar la celda en la matriz interna
+                // Save the cell reference in the internal grid matrix
                 cells[row][column] = cell;
 
-                // Tamaño fijo para todas las celdas (70x70 px)
+                // Fixed size for each cell (70x70 px)
                 cell.setPrefSize(70, 70);
                 cell.setMinSize(70, 70);
                 cell.setMaxSize(70, 70);
 
-                // Centrar el contenido de la celda
+                // Center-align cell text
                 cell.setAlignment(Pos.CENTER);
 
-                // Cálculo exacto de grosores de borde para separar bloques 2x3 (UI/UX)
+                // Calculate border thickness to outline 2x3 sub-blocks (UI/UX layout)
                 int top = (row == 0) ? 2 : 0;
                 int right = (column == 5 || column == 2) ? 2 : 1;
                 int bottom = (row == 5 || row == 1 || row == 3) ? 2 : 1;
                 int left = (column == 0) ? 2 : 0;
 
-                // Aplicar estilo limpio de bordes directamente en la celda
-                cell.setStyle(
+                // Define the base CSS styling for the cell
+                String baseStyle =
                         "-fx-background-color: white;" +
                                 "-fx-background-insets: 0;" +
                                 "-fx-background-radius: 0;" +
@@ -92,38 +89,101 @@ public class GameController implements IGameLog {
                                 "-fx-border-insets: 0;" +
                                 "-fx-border-radius: 0;" +
                                 "-fx-font-size: 20px;" +
-                                "-fx-font-weight: bold;"
-                );
+                                "-fx-font-weight: bold;";
 
-                // Agregar la celda al GridPane
+                // Apply default base style
+                cell.setStyle(baseStyle);
+
+                // Capture current coordinates for the lambda expression scope
+                final int r = row;
+                final int c = column;
+
+                // Real-time listener to validate cell inputs dynamically (HU-4 requirement)
+                cell.textProperty().addListener((observable, oldValue, newValue) -> {
+                    // Clear error border if the cell is emptied
+                    if (newValue.isEmpty()) {
+                        cell.setStyle(baseStyle);
+                        return;
+                    }
+
+                    // Reject input if it is not a digit from 1 to 6
+                    if (!newValue.matches("[1-6]")) {
+                        cell.setText(oldValue);
+                        return;
+                    }
+
+                    // Check Sudoku rules in real-time (row, column, and 2x3 block)
+                    if (!isValidMove(r, c, newValue)) {
+                        // Highlight invalid entry with a red border while preserving base thickness
+                        cell.setStyle(baseStyle + "-fx-border-color: red;");
+                    } else {
+                        // Restore default base styling for valid entry
+                        cell.setStyle(baseStyle);
+                    }
+                });
+
+                // Add cell component to the GridPane layout
                 sudokuGrid.add(cell, column, row);
             }
         }
 
-        // Generar los números iniciales del tablero de Sudoku
+        // Generate the initial board state
         generateInitialBoard();
     }
 
+    /**
+     * Validates whether placing a value at (row, col) respects Sudoku rules.
+     */
+    private boolean isValidMove(int row, int col, String value) {
+        // 1. Validate Row
+        for (int j = 0; j < 6; j++) {
+            if (j != col && cells[row][j].getText().equals(value)) {
+                return false;
+            }
+        }
+
+        // 2. Validate Column
+        for (int i = 0; i < 6; i++) {
+            if (i != row && cells[i][col].getText().equals(value)) {
+                return false;
+            }
+        }
+
+        // 3. Validate 2x3 Sub-block
+        int startRow = (row / 2) * 2;
+        int startColumn = (col / 3) * 3;
+
+        for (int i = startRow; i < startRow + 2; i++) {
+            for (int j = startColumn; j < startColumn + 3; j++) {
+                if ((i != row || j != col) && cells[i][j].getText().equals(value)) {
+                    return false;
+                }
+            }
+        }
+
+        return true; // Valid entry
+    }
+
     private boolean isValid(int[][] board, int row, int column, int number) {
-        // Verificar repetición en la fila
+        // Verify row duplicates
         for (int c = 0; c < 6; c++) {
             if (board[row][c] == number) {
                 return false;
             }
         }
 
-        // Verificar repetición en la columna
+        // Verify column duplicates
         for (int r = 0; r < 6; r++) {
             if (board[r][column] == number) {
                 return false;
             }
         }
 
-        // Determinar inicio del bloque de 2x3
+        // Determine 2x3 sub-block bounds
         int startRow = (row / 2) * 2;
         int startColumn = (column / 3) * 3;
 
-        // Verificar repetición dentro del bloque de 2x3
+        // Verify 2x3 sub-block duplicates
         for (int r = startRow; r < startRow + 2; r++) {
             for (int c = startColumn; c < startColumn + 3; c++) {
                 if (board[r][c] == number) {
@@ -171,14 +231,14 @@ public class GameController implements IGameLog {
             throw new IllegalStateException("Unable to generate a valid Sudoku.");
         }
 
-        // Limpiar todas las celdas
+        // Clear all cell texts
         for (int row = 0; row < 6; row++) {
             for (int column = 0; column < 6; column++) {
                 cells[row][column].clear();
             }
         }
 
-        // Colocar 2 números de ayuda por cada bloque de 2x3
+        // Place 2 initial clue numbers per 2x3 block
         for (int blockRow = 0; blockRow < 6; blockRow += 2) {
             for (int blockColumn = 0; blockColumn < 6; blockColumn += 3) {
                 List<Integer> positions = new ArrayList<>();
@@ -218,20 +278,75 @@ public class GameController implements IGameLog {
         cell.setTextFormatter(formatter);
     }
 
-    // Acción para el botón "New Game" en FXML
+    // Action handler for "New Game" button in FXML
     @FXML
     private void onNewGameClick(ActionEvent event) {
+        availableHints = 3; // Reset hints count for new game
         generateInitialBoard();
-        showNotification("New Game", "Sudoku Reset", "A new game board has been generated.");
+        showNotification("New Game", "Sudoku Reset", "A new game board has been generated. Hints reset to 3.");
     }
 
-    // Acción para el botón "Help" en FXML
+    // Action handler for "Help" button in FXML (HU-5)
     @FXML
     private void onHelpClick(ActionEvent event) {
-        showNotification("Help", "Hint Request", "Help feature will suggest a valid number for an empty cell.");
+        // 1. Check if hints are still available
+        if (availableHints <= 0) {
+            showNotification("Help", "No Hints Left", "You have used all your available hints.");
+            return;
+        }
+
+        // 2. Search for the first empty cell
+        for (int row = 0; row < 6; row++) {
+            for (int column = 0; column < 6; column++) {
+                TextField cell = cells[row][column];
+
+                if (cell.getText().isEmpty()) {
+                    // 3. Find a valid number (1 to 6) for this empty cell
+                    for (int num = 1; num <= 6; num++) {
+                        String value = String.valueOf(num);
+
+                        if (isValidMove(row, column, value)) {
+                            // Place the suggested value
+                            cell.setText(value);
+
+                            // Calculate borders to preserve original 2x3 block grid style
+                            int top = (row == 0) ? 2 : 0;
+                            int right = (column == 5 || column == 2) ? 2 : 1;
+                            int bottom = (row == 5 || row == 1 || row == 3) ? 2 : 1;
+                            int left = (column == 0) ? 2 : 0;
+
+                            // Visually highlight the suggested cell (soft yellow background)
+                            String highlightStyle =
+                                    "-fx-background-color: #FFF9C4;" +
+                                            "-fx-background-insets: 0;" +
+                                            "-fx-background-radius: 0;" +
+                                            "-fx-border-color: #1976D2;" +
+                                            "-fx-border-width: " + top + " " + right + " " + bottom + " " + left + ";" +
+                                            "-fx-border-insets: 0;" +
+                                            "-fx-border-radius: 0;" +
+                                            "-fx-font-size: 20px;" +
+                                            "-fx-font-weight: bold;";
+
+                            cell.setStyle(highlightStyle);
+
+                            // Decrement hint counter
+                            availableHints--;
+
+                            showNotification("Help", "Hint Provided", "A valid number has been suggested. Remaining hints: " + availableHints);
+
+                            // Stop after providing ONE hint
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
+        // If no empty cells were found
+        showNotification("Help", "Board Full", "There are no empty cells left to suggest a move.");
     }
 
-    // Acción para el botón "Exit" en FXML para regresar a la vista de bienvenida
+    // Action handler for "Exit" button in FXML returning to welcome view
     @FXML
     private void onExitClick(ActionEvent event) {
         try {
@@ -247,7 +362,7 @@ public class GameController implements IGameLog {
         }
     }
 
-    // Mostrar notificaciones de diálogo
+    // Display dialog notification windows
     private void showNotification(String title, String header, String content) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
