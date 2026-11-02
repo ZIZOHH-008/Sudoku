@@ -8,18 +8,13 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-import org.example.sudoku.models.IGameLog;
+import org.example.sudoku.models.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
 
 /**
  * Main Controller for the 6x6 Sudoku Game.
@@ -29,13 +24,11 @@ public class GameController implements IGameLog {
 
     @FXML
     private GridPane sudokuGrid;
+    private final SudokuGame game = new SudokuGame();
+
+    private final IAlertBox alertBox = new AlertBox();
 
     private final TextField[][] cells = new TextField[6][6];
-    private final Random random = new Random();
-
-    // Global attributes for solution tracking and hint counter (HU-5)
-    private int[][] solution = new int[6][6];
-    private int availableHints = 3;
 
     @FXML
     public void initialize() {
@@ -100,25 +93,23 @@ public class GameController implements IGameLog {
                 final int c = column;
 
                 // Real-time listener to validate cell inputs dynamically (HU-4 requirement)
+                // validate the Sudoku rules
                 cell.textProperty().addListener((observable, oldValue, newValue) -> {
-                    // Clear error border if the cell is emptied
+
+                    // If the cell is empty, update the model and restore its style
                     if (newValue.isEmpty()) {
+                        game.updateCell(r, c, 0);
                         cell.setStyle(baseStyle);
                         return;
                     }
 
-                    // Reject input if it is not a digit from 1 to 6
-                    if (!newValue.matches("[1-6]")) {
-                        cell.setText(oldValue);
-                        return;
-                    }
+                    // Update the model with the new value
+                    game.updateCell(r, c, Integer.parseInt(newValue));
 
-                    // Check Sudoku rules in real-time (row, column, and 2x3 block)
-                    if (!isValidMove(r, c, newValue)) {
-                        // Highlight invalid entry with a red border while preserving base thickness
+                    // Validate the move using the model
+                    if (!game.isValidMove(r, c, Integer.parseInt(newValue))) {
                         cell.setStyle(baseStyle + "-fx-border-color: red;");
                     } else {
-                        // Restore default base styling for valid entry
                         cell.setStyle(baseStyle);
                     }
                 });
@@ -133,139 +124,27 @@ public class GameController implements IGameLog {
     }
 
     /**
-     * Validates whether placing a value at (row, col) respects Sudoku rules in real-time.
-     */
-    private boolean isValidMove(int row, int col, String value) {
-        // 1. Validate Row
-        for (int j = 0; j < 6; j++) {
-            if (j != col && cells[row][j].getText().equals(value)) {
-                return false;
-            }
-        }
-
-        // 2. Validate Column
-        for (int i = 0; i < 6; i++) {
-            if (i != row && cells[i][col].getText().equals(value)) {
-                return false;
-            }
-        }
-
-        // 3. Validate 2x3 Sub-block
-        int startRow = (row / 2) * 2;
-        int startColumn = (col / 3) * 3;
-
-        for (int i = startRow; i < startRow + 2; i++) {
-            for (int j = startColumn; j < startColumn + 3; j++) {
-                if ((i != row || j != col) && cells[i][j].getText().equals(value)) {
-                    return false;
-                }
-            }
-        }
-
-        return true; // Valid entry
-    }
-
-    /**
-     * Internal backtracking validation for the board solver algorithm.
-     */
-    private boolean isValid(int[][] board, int row, int column, int number) {
-        // Verify row duplicates
-        for (int c = 0; c < 6; c++) {
-            if (board[row][c] == number) {
-                return false;
-            }
-        }
-
-        // Verify column duplicates
-        for (int r = 0; r < 6; r++) {
-            if (board[r][column] == number) {
-                return false;
-            }
-        }
-
-        // Determine 2x3 sub-block bounds
-        int startRow = (row / 2) * 2;
-        int startColumn = (column / 3) * 3;
-
-        // Verify 2x3 sub-block duplicates
-        for (int r = startRow; r < startRow + 2; r++) {
-            for (int c = startColumn; c < startColumn + 3; c++) {
-                if (board[r][c] == number) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Recursive solver using backtracking to build a complete Sudoku solution.
-     */
-    private boolean solveSudoku(int[][] board, int position) {
-        if (position == 36) {
-            return true;
-        }
-
-        int row = position / 6;
-        int column = position % 6;
-
-        List<Integer> numbers = new ArrayList<>();
-        for (int number = 1; number <= 6; number++) {
-            numbers.add(number);
-        }
-        Collections.shuffle(numbers, random);
-
-        for (int number : numbers) {
-            if (isValid(board, row, column, number)) {
-                board[row][column] = number;
-
-                if (solveSudoku(board, position + 1)) {
-                    return true;
-                }
-
-                board[row][column] = 0;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Generates a new solved board state and places initial clues.
      */
     private void generateInitialBoard() {
-        // Reset solution matrix and available hints counter
-        solution = new int[6][6];
-        availableHints = 3;
+        game.startNewGame();
 
-        if (!solveSudoku(solution, 0)) {
-            throw new IllegalStateException("Unable to generate a valid Sudoku.");
-        }
+        int[][] initialBoard = game.getBoard();
 
-        // Clear all cell texts
+        // First: clear all cells
         for (int row = 0; row < 6; row++) {
             for (int column = 0; column < 6; column++) {
                 cells[row][column].clear();
             }
         }
 
-        // Place 2 initial clue numbers per 2x3 block
-        for (int blockRow = 0; blockRow < 6; blockRow += 2) {
-            for (int blockColumn = 0; blockColumn < 6; blockColumn += 3) {
-                List<Integer> positions = new ArrayList<>();
-                for (int i = 0; i < 6; i++) {
-                    positions.add(i);
-                }
+        // Second: place initial clues
+        for (int row = 0; row < 6; row++) {
+            for (int column = 0; column < 6; column++) {
+                int number = initialBoard[row][column];
 
-                Collections.shuffle(positions, random);
-
-                for (int i = 0; i < 2; i++) {
-                    int position = positions.get(i);
-                    int row = blockRow + position / 3;
-                    int column = blockColumn + position % 3;
-
-                    cells[row][column].setText(String.valueOf(solution[row][column]));
+                if (number != 0) {
+                    cells[row][column].setText(String.valueOf(number));
                 }
             }
         }
@@ -275,6 +154,7 @@ public class GameController implements IGameLog {
      * Restricts inputs in cells to single digits from 1 to 6.
      */
     private void configureCell(TextField cell) {
+        //validate what the user can enter
         TextFormatter<String> formatter = new TextFormatter<>(change -> {
             String newText = change.getControlNewText();
 
@@ -293,64 +173,60 @@ public class GameController implements IGameLog {
         cell.setTextFormatter(formatter);
     }
 
+
     // Action handler for "New Game" button in FXML
     @FXML
-    private void onNewGameClick(ActionEvent event) {
+    private void onNewGameClick() {
         generateInitialBoard();
-        showNotification("New Game", "Sudoku Reset", "A new game board has been generated.");
+        alertBox.showInformationBox("New Game",
+                "Sudoku Reset",
+                "A new game board has been generated.");
     }
 
     // Action handler for "Help" button in FXML (HU-5 requirement)
     @FXML
-    private void onHelpClick(ActionEvent event) {
-        // 1. Check if the user has available hints left
-        if (availableHints <= 0) {
-            showNotification("Help", "No Hints Left", "You have used all your available hints for this game.");
+    public void onHelpClick() {
+        if (game.getAvailableHints() <= 0) {
+            alertBox.showInformationBox(
+                    "Help",
+                    "No Hints Left",
+                    "You have used all your available hints."
+            );
             return;
         }
 
-        // 2. Search for the first empty cell in the grid
-        for (int row = 0; row < 6; row++) {
-            for (int column = 0; column < 6; column++) {
-                TextField cell = cells[row][column];
+        int[] hint = game.provideHint();
 
-                if (cell.getText().isEmpty()) {
-                    // 3. Insert the exact correct value from the solution matrix
-                    cell.setText(String.valueOf(solution[row][column]));
-
-                    // 4. Calculate border thickness to preserve original 2x3 block grid layout
-                    int top = (row == 0) ? 2 : 0;
-                    int right = (column == 5 || column == 2) ? 2 : 1;
-                    int bottom = (row == 5 || row == 1 || row == 3) ? 2 : 1;
-                    int left = (column == 0) ? 2 : 0;
-
-                    // 5. Visually highlight the suggested cell with a soft yellow background
-                    String highlightStyle =
-                            "-fx-background-color: #FFF9C4;" +
-                                    "-fx-background-insets: 0;" +
-                                    "-fx-background-radius: 0;" +
-                                    "-fx-border-color: #1976D2;" +
-                                    "-fx-border-width: " + top + " " + right + " " + bottom + " " + left + ";" +
-                                    "-fx-border-insets: 0;" +
-                                    "-fx-border-radius: 0;" +
-                                    "-fx-font-size: 20px;" +
-                                    "-fx-font-weight: bold;";
-
-                    cell.setStyle(highlightStyle);
-
-                    // 6. Decrement remaining hints
-                    availableHints--;
-
-                    showNotification("Help", "Hint Provided", "A valid number from the solution was suggested. Remaining hints: " + availableHints);
-
-                    // Stop execution to provide only ONE hint per button click
-                    return;
-                }
-            }
+        if (hint == null) {
+            alertBox.showInformationBox(
+                    "Help",
+                    "Board Full",
+                    "There are no empty cells left."
+            );
+            return;
         }
 
-        // Notify if the board has no empty cells
-        showNotification("Help", "Board Full", "There are no empty cells left to give a hint.");
+        int row = hint[0];
+        int column = hint[1];
+        int number = hint[2];
+
+        cells[row][column].setText(String.valueOf(number));
+
+        cells[row][column].setStyle(
+                "-fx-background-color: #FFF3B0;" +
+                        "-fx-border-color: #52677F;" +
+                        "-fx-border-width: 1;" +
+                        "-fx-border-radius: 0;" +
+                        "-fx-font-size: 20px;" +
+                        "-fx-font-weight: bold;"
+        );
+
+        alertBox.showInformationBox(
+                "Help",
+                "Hint Provided",
+                "A number has been revealed. Remaining hints: "
+                        + game.getAvailableHints()
+        );
     }
 
     // Action handler for "Exit" button in FXML returning to welcome view
@@ -370,16 +246,4 @@ public class GameController implements IGameLog {
     }
 
     // Display dialog notification windows
-    private void showNotification(String title, String header, String content) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(header);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
-
-    @Override
-    public void logEvent(String eventMessage) {
-        System.out.println("[LOG]: " + eventMessage);
-    }
 }

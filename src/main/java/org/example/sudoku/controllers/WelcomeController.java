@@ -12,26 +12,22 @@ import org.example.sudoku.models.IGameLog;
 
 import java.io.IOException;
 
-
-
-
-
 public class WelcomeController implements IGameLog {
+
+    private final IAlertBox alertBox = new AlertBox();
 
     @FXML
     public void enterGame(ActionEvent event) throws IOException {
         logEvent("UI Event: Clicked Start Game button");
 
-        AlertBox alertBox = new AlertBox();
         boolean response = alertBox.showConfirmBox(
                 "Start Game",
                 "¡Hi there!",
                 "¿Do you want to start a game?");
 
-
-
-        if (response){
+        if (response) {
             logEvent("UI Event: Load Game View");
+
             Stage stage = (Stage) ((Node) event.getSource())
                     .getScene()
                     .getWindow();
@@ -44,25 +40,20 @@ public class WelcomeController implements IGameLog {
 
             stage.setScene(scene);
             stage.show();
-            
-        }
 
-        else{
+        } else {
             logEvent("UI Event: Cancel game");
-            System.out.println("No quisiste jugar");
         }
     }
-
-
-
 
     @FXML
     private void exitGame(ActionEvent event) {
         logEvent("UI Event: Clicked Exit Game button");
-        Stage stage = (Stage) ((Node) event.getSource()) //Elemento
-                .getScene() //Escena
-                .getWindow(); //Ventana
+
+        Stage stage = (Stage) ((Node) event.getSource())
+                .getScene()
+                .getWindow();
+
         stage.close();
     }
-
 }

@@ -5,24 +5,29 @@ import javafx.scene.control.ButtonType;
 
 import java.util.Optional;
 
-
 public class AlertBox implements IAlertBox {
 
-        @Override
-        public boolean showConfirmBox(String title, String header, String message){
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle(title);
-            alert.setHeaderText(header);
-            alert.setContentText(message);
+    @Override
+    public boolean showConfirmBox(String title, String header, String message) {
 
-            Optional<ButtonType> response = alert.showAndWait();
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(message);
 
-            if(response.isPresent() && response.get() == ButtonType.OK){ //Si tenes una respuesta y es Ok
-                return true;
-            }
-            return false;
-        }
+        Optional<ButtonType> response = alert.showAndWait();
 
+        return response.isPresent() && response.get() == ButtonType.OK;
+    }
+
+    @Override
+    public void showInformationBox(String title, String header, String message) {
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(message);
+
+        alert.showAndWait();
+    }
 }
-
-
