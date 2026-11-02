@@ -2,17 +2,15 @@ package org.example.sudoku.controllers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import org.example.sudoku.models.*;
+import org.example.sudoku.views.WelcomeView;
 
 import java.io.IOException;
 
@@ -126,18 +124,21 @@ public class GameController implements IGameLog {
     /**
      * Generates a new solved board state and places initial clues.
      */
-    private void generateInitialBoard() {
+    public void generateInitialBoard() {
         game.startNewGame();
 
         int[][] initialBoard = game.getBoard();
 
         // First: clear all cells
+        // First: clear all cells
         for (int row = 0; row < 6; row++) {
             for (int column = 0; column < 6; column++) {
                 cells[row][column].clear();
+                cells[row][column].setEditable(true);
             }
         }
 
+        // Second: place initial clues
         // Second: place initial clues
         for (int row = 0; row < 6; row++) {
             for (int column = 0; column < 6; column++) {
@@ -145,10 +146,12 @@ public class GameController implements IGameLog {
 
                 if (number != 0) {
                     cells[row][column].setText(String.valueOf(number));
+                    cells[row][column].setEditable(false);
                 }
             }
         }
     }
+
 
     /**
      * Restricts inputs in cells to single digits from 1 to 6.
@@ -232,14 +235,13 @@ public class GameController implements IGameLog {
     // Action handler for "Exit" button in FXML returning to welcome view
     @FXML
     private void onExitClick(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/sudoku/welcome-view.fxml"));
-            Parent root = loader.load();
+        Stage gameStage = (Stage) ((Node) event.getSource())
+                .getScene()
+                .getWindow();
 
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            Scene scene = new Scene(root);
-            stage.setScene(scene);
-            stage.show();
+        gameStage.hide();
+        try {
+            WelcomeView.getInstance().show();
         } catch (IOException e) {
             logEvent("Error returning to welcome view: " + e.getMessage());
         }

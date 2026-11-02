@@ -16,6 +16,8 @@ public class SudokuGame {
         this.availableHints = 3;
     }
 
+
+
     /**
      * Starts a new Sudoku game.
      */
@@ -43,6 +45,8 @@ public class SudokuGame {
         board[row][column] = number;
     }
 
+
+
     /**
      * Checks whether a move follows Sudoku rules.
      */
@@ -51,6 +55,7 @@ public class SudokuGame {
     }
 
 
+    
     /**
      * Provides a hint by filling the first empty cell.
      *

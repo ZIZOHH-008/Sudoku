@@ -52,10 +52,4 @@ public class SudokuValidator {
 
         return true;
     }
-
-
-    /**
-     * Updates the value of a cell in the current board.
-     */
-
 }

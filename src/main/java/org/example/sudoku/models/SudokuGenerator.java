@@ -14,6 +14,7 @@ public class SudokuGenerator {
 
     private final Random random = new Random();
 
+
     /**
      * Generates a complete and valid Sudoku solution.
      */
@@ -131,7 +132,7 @@ public class SudokuGenerator {
             }
         }
 
-        // Check 2x3 block
+        // Check 2x3
         int startRow = (row / BLOCK_ROWS) * BLOCK_ROWS;
         int startColumn = (column / BLOCK_COLUMNS) * BLOCK_COLUMNS;
 
