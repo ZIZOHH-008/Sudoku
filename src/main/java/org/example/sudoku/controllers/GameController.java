@@ -5,6 +5,9 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.GridPane;
@@ -13,19 +16,22 @@ import org.example.sudoku.models.*;
 import org.example.sudoku.views.WelcomeView;
 
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * Main Controller for the 6x6 Sudoku Game.
- * Manages grid creation, button interactions, real-time validation (HU-4), and hint logic (HU-5).
+ * Manages grid creation, button interactions, real-time validation (HU-4), dynamic UI messaging, and hint logic (HU-5).
  */
 public class GameController implements IGameLog {
 
     @FXML
     private GridPane sudokuGrid;
+
+    @FXML
+    private Label errorMessageLabel;
+
     private final SudokuGame game = new SudokuGame();
-
     private final IAlertBox alertBox = new AlertBox();
-
     private final TextField[][] cells = new TextField[6][6];
 
     @FXML
@@ -91,24 +97,34 @@ public class GameController implements IGameLog {
                 final int c = column;
 
                 // Real-time listener to validate cell inputs dynamically (HU-4 requirement)
-                // validate the Sudoku rules
                 cell.textProperty().addListener((observable, oldValue, newValue) -> {
 
-                    // If the cell is empty, update the model and restore its style
+                    // If the cell is empty, update the model, clear error message, and restore default style
                     if (newValue.isEmpty()) {
                         game.updateCell(r, c, 0);
                         cell.setStyle(baseStyle);
+                        if (errorMessageLabel != null) {
+                            errorMessageLabel.setText("");
+                        }
                         return;
                     }
 
+                    int value = Integer.parseInt(newValue);
+
                     // Update the model with the new value
-                    game.updateCell(r, c, Integer.parseInt(newValue));
+                    game.updateCell(r, c, value);
 
                     // Validate the move using the model
-                    if (!game.isValidMove(r, c, Integer.parseInt(newValue))) {
+                    if (!game.isValidMove(r, c, value)) {
                         cell.setStyle(baseStyle + "-fx-border-color: red;");
+                        if (errorMessageLabel != null) {
+                            errorMessageLabel.setText("Invalid move! Try again with another number.");
+                        }
                     } else {
                         cell.setStyle(baseStyle);
+                        if (errorMessageLabel != null) {
+                            errorMessageLabel.setText("");
+                        }
                     }
                 });
 
@@ -129,7 +145,11 @@ public class GameController implements IGameLog {
 
         int[][] initialBoard = game.getBoard();
 
-        // First: clear all cells
+        // Clear error display if label exists
+        if (errorMessageLabel != null) {
+            errorMessageLabel.setText("");
+        }
+
         // First: clear all cells
         for (int row = 0; row < 6; row++) {
             for (int column = 0; column < 6; column++) {
@@ -138,7 +158,6 @@ public class GameController implements IGameLog {
             }
         }
 
-        // Second: place initial clues
         // Second: place initial clues
         for (int row = 0; row < 6; row++) {
             for (int column = 0; column < 6; column++) {
@@ -152,12 +171,10 @@ public class GameController implements IGameLog {
         }
     }
 
-
     /**
      * Restricts inputs in cells to single digits from 1 to 6.
      */
     private void configureCell(TextField cell) {
-        //validate what the user can enter
         TextFormatter<String> formatter = new TextFormatter<>(change -> {
             String newText = change.getControlNewText();
 
@@ -169,21 +186,29 @@ public class GameController implements IGameLog {
                 return change;
             }
 
-            logEvent("Invalid entry");
+            logEvent("Invalid entry attempt: " + newText);
             return null;
         });
 
         cell.setTextFormatter(formatter);
     }
 
-
     // Action handler for "New Game" button in FXML
     @FXML
     private void onNewGameClick() {
-        generateInitialBoard();
-        alertBox.showInformationBox("New Game",
-                "Sudoku Reset",
-                "A new game board has been generated.");
+        // 1. Create and configure confirmation alert
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirm New Game");
+        alert.setHeaderText("Start a new game?");
+        alert.setContentText("If you reset the board, your progress will be lost.");
+
+        // 2. Wait for user input
+        Optional<ButtonType> result = alert.showAndWait();
+
+        // 3. If user confirms, generate a new board and clear error messages
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            generateInitialBoard();
+        }
     }
 
     // Action handler for "Help" button in FXML (HU-5 requirement)
@@ -246,6 +271,4 @@ public class GameController implements IGameLog {
             logEvent("Error returning to welcome view: " + e.getMessage());
         }
     }
-
-    // Display dialog notification windows
 }

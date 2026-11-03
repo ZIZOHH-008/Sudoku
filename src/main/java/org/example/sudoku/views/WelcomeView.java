@@ -7,7 +7,6 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-
 public class WelcomeView extends Stage {
 
     public WelcomeView() throws IOException {
@@ -30,7 +29,11 @@ public class WelcomeView extends Stage {
         return WelcomeViewHolder.INSTANCE;
     }
 
+    public static void deleteInstance() {
+        WelcomeViewHolder.INSTANCE = null;
+    }
+
     private static class WelcomeViewHolder {
-        private static WelcomeView INSTANCE = null;
+        private static WelcomeView INSTANCE;
     }
 }
