@@ -20,20 +20,35 @@ import java.util.Optional;
 
 /**
  * Main Controller for the 6x6 Sudoku Game.
- * Manages grid creation, button interactions, real-time validation (HU-4), dynamic UI messaging, and hint logic (HU-5).
+ * Manages grid creation, button interactions, real-time validation (HU-4), dynamic UI messaging, and hint logic (HU-5)
+ * Controls the Sudoku game interface and handles user interactions
+ */
+/**
+
  */
 public class GameController implements IGameLog {
 
+    /** References the grid containing the Sudoku cells. */
     @FXML
     private GridPane sudokuGrid;
 
+    /** Displays validation error messages. */
     @FXML
     private Label errorMessageLabel;
 
+    /** Manages the Sudoku game logic. */
     private final SudokuGame game = new SudokuGame();
+
+    /** Provides confirmation and information dialogs. */
     private final IAlertBox alertBox = new AlertBox();
+
+    /** Stores references to the Sudoku text fields. */
     private final TextField[][] cells = new TextField[6][6];
 
+    /**
+     * Initializes the Sudoku grid, configures its cells,
+     * and generates the initial board.
+     */
     @FXML
     public void initialize() {
         // Clear default layout constraints to prevent grid distortion
@@ -171,9 +186,14 @@ public class GameController implements IGameLog {
         }
     }
 
+
+
     /**
-     * Restricts inputs in cells to single digits from 1 to 6.
+     * Configures a text field to accept only numbers from 1 to 6.
+     *
+     * @param cell the text field to configure
      */
+// MATRIX: access a specific cell
     private void configureCell(TextField cell) {
         TextFormatter<String> formatter = new TextFormatter<>(change -> {
             String newText = change.getControlNewText();
@@ -187,13 +207,18 @@ public class GameController implements IGameLog {
             }
 
             logEvent("Invalid entry attempt: " + newText);
+            errorMessageLabel.setText("Invalid move! Try again with another number.");
             return null;
         });
 
         cell.setTextFormatter(formatter);
     }
 
-    // Action handler for "New Game" button in FXML
+    /**
+     * Handles the New Game button click and asks for confirmation
+     * before generating a new board.
+     */
+// Action handler for "New Game" button in FXML
     @FXML
     private void onNewGameClick() {
         // 1. Create and configure confirmation alert
@@ -211,7 +236,10 @@ public class GameController implements IGameLog {
         }
     }
 
-    // Action handler for "Help" button in FXML (HU-5 requirement)
+    /**
+     * Handles the Help button click and provides a hint if available.
+     */
+// Action handler for "Help" button in FXML (HU-5 requirement)
     @FXML
     public void onHelpClick() {
         if (game.getAvailableHints() <= 0) {
@@ -257,7 +285,12 @@ public class GameController implements IGameLog {
         );
     }
 
-    // Action handler for "Exit" button in FXML returning to welcome view
+    /**
+     * Handles the Exit button click and returns to the welcome view.
+     *
+     * @param event the button click event
+     */
+// Action handler for "Exit" button in FXML returning to welcome view
     @FXML
     private void onExitClick(ActionEvent event) {
         Stage gameStage = (Stage) ((Node) event.getSource())

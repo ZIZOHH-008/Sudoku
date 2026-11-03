@@ -12,10 +12,20 @@ import org.example.sudoku.views.WelcomeView;
 
 import java.io.IOException;
 
+/**
+ * Controls the welcome screen and handles game entry and exit actions.
+ */
 public class WelcomeController implements IGameLog {
 
+    /** Provides confirmation and information dialogs. */
     private final IAlertBox alertBox = new AlertBox();
 
+    /**
+     * Confirms and opens a new Sudoku game.
+     *
+     * @param event the button click event
+     * @throws IOException if an error occurs while loading the game view
+     */
     @FXML
     public void enterGame(ActionEvent event) throws IOException {
         logEvent("UI Event: Clicked Start Game button");
@@ -44,18 +54,23 @@ public class WelcomeController implements IGameLog {
         }
     }
 
+    /**
+     * Closes the current window and clears the welcome view instance.
+     *
+     * @param event the button click event
+     */
     @FXML
     public void exitGame(ActionEvent event) {
         logEvent("UI Event: Clicked Exit Game button");
 
-        // Cierra la ventana actual desde la que se hizo clic
+        // Closes the current window from which the click was made
         Stage currentStage = (Stage) ((Node) event.getSource())
                 .getScene()
                 .getWindow();
 
         currentStage.close();
 
-        // Limpia la instancia Singleton de la vista de bienvenida
+        // Clears the Singleton instance of the welcome view
         WelcomeView.deleteInstance();
     }
 }

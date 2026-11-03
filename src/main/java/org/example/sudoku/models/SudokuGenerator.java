@@ -6,18 +6,31 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Generates valid Sudoku solutions and initial game boards.
+ */
 public class SudokuGenerator {
 
+    /** Defines the board size. */
     private static final int SIZE = 6;
+
+    /** Defines the number of rows in each block. */
     private static final int BLOCK_ROWS = 2;
+
+    /** Defines the number of columns in each block. */
     private static final int BLOCK_COLUMNS = 3;
 
+    /** Random generator used to shuffle numbers and positions. */
     private final Random random = new Random();
 
 
     /**
      * Generates a complete and valid Sudoku solution.
+     *
+     * @return a complete 6x6 Sudoku solution
+     * @throws IllegalStateException if a valid solution cannot be generated
      */
+    // check answers and validate board
     public int[][] generateSolution() {
         int[][] solution = new int[SIZE][SIZE];
 
@@ -33,6 +46,10 @@ public class SudokuGenerator {
     /**
      * Generates an initial board with two clues per 2x3 block.
      * Empty positions are represented by zero.
+     *
+     * @param solution the complete Sudoku solution
+     * @return the initial Sudoku board
+     * @throws IllegalArgumentException if the solution is invalid
      */
     public int[][] generateInitialBoard(int[][] solution) {
 
@@ -49,7 +66,7 @@ public class SudokuGenerator {
                  blockColumn < SIZE;
                  blockColumn += BLOCK_COLUMNS) {
 
-                List<Integer> positions = new ArrayList<>();
+                List<Integer> positions = new ArrayList<>(); //initial number positions
 
                 for (int i = 0; i < BLOCK_ROWS * BLOCK_COLUMNS; i++) {
                     positions.add(i);
@@ -72,7 +89,11 @@ public class SudokuGenerator {
     }
 
     /**
-     * Recursive backtracking algorithm.
+     * Generates a Sudoku solution using recursive backtracking.
+     *
+     * @param board the board being filled
+     * @param position the current cell position
+     * @return {@code true} if a complete solution is found; {@code false} otherwise
      */
     private boolean solveSudoku(int[][] board, int position) {
 
@@ -83,7 +104,7 @@ public class SudokuGenerator {
         int row = position / SIZE;
         int column = position % SIZE;
 
-        List<Integer> numbers = new ArrayList<>();
+        List<Integer> numbers = new ArrayList<>(); //test solutions
 
         for (int number = 1; number <= SIZE; number++) {
             numbers.add(number);
@@ -109,7 +130,14 @@ public class SudokuGenerator {
     }
 
     /**
-     * Checks whether a number can be placed in a position.
+     * Checks whether a number can be placed in a specific position.
+     *
+     * @param board the Sudoku board
+     * @param row the target row
+     * @param column the target column
+     * @param number the number to validate
+     * @return {@code true} if the number does not violate Sudoku rules;
+     *         {@code false} otherwise
      */
     private boolean isValid(
             int[][] board,
