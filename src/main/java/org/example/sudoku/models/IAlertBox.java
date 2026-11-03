@@ -1,7 +1,8 @@
 package org.example.sudoku.models;
 
-import javafx.scene.control.Alert;
-
 public interface IAlertBox {
-    public boolean showConfirmBox(String title, String Header, String messaje);
+
+    boolean showConfirmBox(String title, String header, String message);
+
+    void showInformationBox(String title, String header, String message);
 }
