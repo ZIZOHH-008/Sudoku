@@ -45,13 +45,17 @@ public class WelcomeController implements IGameLog {
     }
 
     @FXML
-    private void exitGame() {
+    public void exitGame(ActionEvent event) {
         logEvent("UI Event: Clicked Exit Game button");
 
-        try {
-            WelcomeView.getInstance().close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        // Cierra la ventana actual desde la que se hizo clic
+        Stage currentStage = (Stage) ((Node) event.getSource())
+                .getScene()
+                .getWindow();
+
+        currentStage.close();
+
+        // Limpia la instancia Singleton de la vista de bienvenida
+        WelcomeView.deleteInstance();
     }
 }
