@@ -1,7 +1,26 @@
 package org.example.sudoku.models;
 
-import javafx.scene.control.Alert;
-
+/**
+ * Defines methods for displaying alert dialogs.
+ */
 public interface IAlertBox {
-    public boolean showConfirmBox(String title, String Header, String messaje);
+
+    /**
+     * Displays a confirmation dialog.
+     *
+     * @param title the dialog title
+     * @param header the dialog header
+     * @param message the dialog message
+     * @return {@code true} if the user confirms; {@code false} otherwise
+     */
+    boolean showConfirmBox(String title, String header, String message);
+
+    /**
+     * Displays an information dialog.
+     *
+     * @param title the dialog title
+     * @param header the dialog header
+     * @param message the dialog message
+     */
+    void showInformationBox(String title, String header, String message);
 }
