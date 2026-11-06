@@ -111,6 +111,13 @@ public class SudokuGame {
         return hint;
     }
 
+
+
+    /**
+     * Checks whether the board is completely filled and matches the solution.
+     *
+     * @return {@code true} if the board is solved; {@code false} otherwise
+     */
     public boolean isSolved() {
         if (board == null || solution == null) {
             return false;

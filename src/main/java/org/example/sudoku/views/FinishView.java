@@ -8,8 +8,19 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+
+
+/**
+ * Represents the modal window displayed when the game is completed.
+ */
 public class FinishView extends Stage {
 
+    /**
+     * Creates and configures the finish screen.
+     *
+     * @param owner the game window that owns this dialog
+     * @throws IOException if the FXML file cannot be loaded
+     */
     public FinishView(Stage owner) throws IOException {
         // Load finish screen
         FXMLLoader loader = new FXMLLoader(

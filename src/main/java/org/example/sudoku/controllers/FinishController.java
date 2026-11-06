@@ -9,8 +9,17 @@ import org.example.sudoku.views.WelcomeView;
 
 import java.io.IOException;
 
+
+/**
+ * Controls the finish screen and handles navigation back to the main menu.
+ */
 public class FinishController implements IGameLog {
 
+    /**
+     * Closes the finish screen and returns to the main menu.
+     *
+     * @param event the button click event
+     */
     @FXML
     private void onExitClick(ActionEvent event) {
         Stage finishStage = (Stage) ((Node) event.getSource())

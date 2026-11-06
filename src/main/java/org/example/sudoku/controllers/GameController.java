@@ -159,6 +159,7 @@ public class GameController implements IGameLog {
         generateInitialBoard();
     }
 
+
     /**
      * Generates a new solved board state and places initial clues.
      */
@@ -196,6 +197,10 @@ public class GameController implements IGameLog {
         }
     }
 
+
+    /**
+     * Checks whether the game has been completed and displays the finish view.
+     */
     private void checkForVictory() {
         // Skip if already shown
         if (finishShown) {
@@ -211,6 +216,11 @@ public class GameController implements IGameLog {
         }
     }
 
+
+    /**
+     * Creates and displays the finish view.
+     * Logs an error if the view cannot be created.
+     */
     private void showFinishView() {
         Stage gameStage = (Stage) sudokuGrid.getScene().getWindow();
 
@@ -222,6 +232,7 @@ public class GameController implements IGameLog {
             logEvent("Error showing the end-game view: " + e.getMessage());
         }
     }
+
 
     /**
      * Configures a text field to accept only numbers from 1 to 6.
