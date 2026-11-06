@@ -13,6 +13,7 @@ import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import org.example.sudoku.models.*;
+import org.example.sudoku.views.FinishView;
 import org.example.sudoku.views.WelcomeView;
 
 import java.io.IOException;
@@ -44,6 +45,9 @@ public class GameController implements IGameLog {
 
     /** Stores references to the Sudoku text fields. */
     private final TextField[][] cells = new TextField[6][6];
+
+    // Avoid duplicate finish dialog
+    private boolean finishShown = false;
 
     /**
      * Initializes the Sudoku grid, configures its cells,
@@ -141,6 +145,9 @@ public class GameController implements IGameLog {
                             errorMessageLabel.setText("");
                         }
                     }
+
+                    // Check victory
+                    checkForVictory();
                 });
 
                 // Add cell component to the GridPane layout
@@ -156,6 +163,9 @@ public class GameController implements IGameLog {
      * Generates a new solved board state and places initial clues.
      */
     public void generateInitialBoard() {
+        // Reset finish flag
+        finishShown = false;
+
         game.startNewGame();
 
         int[][] initialBoard = game.getBoard();
@@ -186,7 +196,32 @@ public class GameController implements IGameLog {
         }
     }
 
+    private void checkForVictory() {
+        // Skip if already shown
+        if (finishShown) {
+            return;
+        }
 
+        // Ask model for victory
+        if (game.isSolved()) {
+            finishShown = true;
+
+            // Show finish dialog
+            showFinishView();
+        }
+    }
+
+    private void showFinishView() {
+        Stage gameStage = (Stage) sudokuGrid.getScene().getWindow();
+
+        try {
+            // Create finish window
+            FinishView finishView = new FinishView(gameStage);
+            finishView.show();
+        } catch (IOException e) {
+            logEvent("Error showing the end-game view: " + e.getMessage());
+        }
+    }
 
     /**
      * Configures a text field to accept only numbers from 1 to 6.

@@ -110,4 +110,21 @@ public class SudokuGame {
 
         return hint;
     }
+
+    public boolean isSolved() {
+        if (board == null || solution == null) {
+            return false;
+        }
+
+        // Compare with solution
+        for (int row = 0; row < board.length; row++) {
+            for (int column = 0; column < board[row].length; column++) {
+                if (board[row][column] == 0 || board[row][column] != solution[row][column]) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
 }
