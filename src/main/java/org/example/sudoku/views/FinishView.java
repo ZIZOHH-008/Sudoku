@@ -3,7 +3,6 @@ package org.example.sudoku.views;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -32,13 +31,6 @@ public class FinishView extends Stage {
 
         setTitle("Sudoku Game");
         setScene(scene);
-
-        // Keep game window as owner
-        initOwner(owner);
-
-        // Make window modal
-        initModality(Modality.WINDOW_MODAL);
-
         setResizable(false);
         sizeToScene();
     }

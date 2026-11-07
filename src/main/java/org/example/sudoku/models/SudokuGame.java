@@ -1,5 +1,4 @@
 package org.example.sudoku.models;
-
 /**
  * Represents a Sudoku game and manages its board, solution, and hints.
  */
@@ -119,15 +118,44 @@ public class SudokuGame {
      * @return {@code true} if the board is solved; {@code false} otherwise
      */
     public boolean isSolved() {
-        if (board == null || solution == null) {
+        if (board == null) {
             return false;
         }
 
-        // Compare with solution
-        for (int row = 0; row < board.length; row++) {
-            for (int column = 0; column < board[row].length; column++) {
-                if (board[row][column] == 0 || board[row][column] != solution[row][column]) {
+        for (int row = 0; row < 6; row++) {
+            for (int column = 0; column < 6; column++) {
+
+                int number = board[row][column];
+
+                // No puede haber casillas vacías ni números fuera del rango.
+                if (number < 1 || number > 6) {
                     return false;
+                }
+
+                // Comprobar fila y columna.
+                for (int i = 0; i < 6; i++) {
+
+                    if (i != column && board[row][i] == number) {
+                        return false;
+                    }
+
+                    if (i != row && board[i][column] == number) {
+                        return false;
+                    }
+                }
+
+                // Comprobar bloque de 2x3.
+                int startRow = (row / 2) * 2;
+                int startColumn = (column / 3) * 3;
+
+                for (int r = startRow; r < startRow + 2; r++) {
+                    for (int c = startColumn; c < startColumn + 3; c++) {
+
+                        if ((r != row || c != column)
+                                && board[r][c] == number) {
+                            return false;
+                        }
+                    }
                 }
             }
         }
