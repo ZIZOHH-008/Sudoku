@@ -37,6 +37,7 @@ public class GameController implements IGameLog {
     @FXML
     private Label errorMessageLabel;
 
+
     /** Manages the Sudoku game logic. */
     private final SudokuGame game = new SudokuGame();
 
@@ -198,20 +199,18 @@ public class GameController implements IGameLog {
     }
 
 
+
+
     /**
      * Checks whether the game has been completed and displays the finish view.
      */
     private void checkForVictory() {
-        // Skip if already shown
         if (finishShown) {
             return;
         }
 
-        // Ask model for victory
         if (game.isSolved()) {
             finishShown = true;
-
-            // Show finish dialog
             showFinishView();
         }
     }
@@ -222,12 +221,14 @@ public class GameController implements IGameLog {
      * Logs an error if the view cannot be created.
      */
     private void showFinishView() {
-        Stage gameStage = (Stage) sudokuGrid.getScene().getWindow();
-
         try {
-            // Create finish window
-            FinishView finishView = new FinishView(gameStage);
+            FinishView finishView = new FinishView(null);
+
             finishView.show();
+
+            Stage gameStage = (Stage) sudokuGrid.getScene().getWindow();
+            gameStage.close();
+
         } catch (IOException e) {
             logEvent("Error showing the end-game view: " + e.getMessage());
         }
@@ -267,19 +268,31 @@ public class GameController implements IGameLog {
 // Action handler for "New Game" button in FXML
     @FXML
     private void onNewGameClick() {
-        // 1. Create and configure confirmation alert
+        // Create and configure confirmation alert
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirm New Game");
-        alert.setHeaderText("Start a new game?");
-        alert.setContentText("If you reset the board, your progress will be lost.");
 
-        // 2. Wait for user input
+        // Wait for user input
         Optional<ButtonType> result = alert.showAndWait();
 
-        // 3. If user confirms, generate a new board and clear error messages
+        // If user confirms, generate a new board and clear error messages
         if (result.isPresent() && result.get() == ButtonType.OK) {
             generateInitialBoard();
         }
+    }
+
+
+    private int countEmptyCells() {
+        int count = 0;
+
+        for (int row = 0; row < cells.length; row++) {
+            for (int column = 0; column < cells[row].length; column++) {
+                if (cells[row][column].getText().isEmpty()) {
+                    count++;
+                }
+            }
+        }
+
+        return count;
     }
 
     /**
@@ -293,6 +306,16 @@ public class GameController implements IGameLog {
                     "Help",
                     "No Hints Left",
                     "You have used all your available hints."
+            );
+            return;
+        }
+
+        // Prevent using the last hint to complete the board
+        if (countEmptyCells() <= 1) {
+            alertBox.showInformationBox(
+                    "Help",
+                    "Hint Not Available",
+                    "You must complete the last empty cell by yourself."
             );
             return;
         }
