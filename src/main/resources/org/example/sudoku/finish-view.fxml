@@ -22,7 +22,7 @@
       <VBox alignment="CENTER" layoutX="208.0" layoutY="83.0" prefHeight="343.0" prefWidth="287.0" spacing="30.0" AnchorPane.bottomAnchor="82.0" AnchorPane.leftAnchor="208.0" AnchorPane.rightAnchor="208.0" AnchorPane.topAnchor="83.0">
          <children>
             <!-- Victory message -->
-            <Label style="-fx-text-fill: #2C3E50;" text="¡Acabaste!" textAlignment="CENTER" wrapText="true">
+            <Label style="-fx-text-fill: #2C3E50;" text="¡You win!" textAlignment="CENTER" wrapText="true">
                <font>
                   <Font name="Noto Sans Bold" size="27.0" />
                </font>
@@ -32,11 +32,11 @@
             </Label>
             <ImageView fitHeight="192.0" fitWidth="247.0" opacity="0.61" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../../../images/ganadorCatst.png" />
+                  <Image url="@../../../images/Ganador.jpeg" />
                </image>
             </ImageView>
             <!-- Exit button -->
-            <Button fx:id="btnExitFinish" mnemonicParsing="false" onAction="#onExitClick" prefHeight="38.0" prefWidth="84.0" style="-fx-border-radius: 20; -fx-background-radius: 20; -fx-border-color: #2F4F4F;" text="Salir">
+            <Button fx:id="btnExitFinish" mnemonicParsing="false" onAction="#onExitClick" prefHeight="38.0" prefWidth="84.0" style="-fx-border-radius: 20; -fx-background-radius: 20; -fx-border-color: #2F4F4F;" text="Exit">
                <font>
                   <Font name="Noto Sans Bold" size="17.0" />
                </font>
