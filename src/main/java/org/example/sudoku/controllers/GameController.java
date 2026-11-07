@@ -268,8 +268,10 @@ public class GameController implements IGameLog {
 // Action handler for "New Game" button in FXML
     @FXML
     private void onNewGameClick() {
-        // Create and configure confirmation alert
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirm New Game");
+        alert.setHeaderText("Start a new game?");
+        alert.setContentText("If you reset the board, your progress will be lost.");
 
         // Wait for user input
         Optional<ButtonType> result = alert.showAndWait();
@@ -279,6 +281,7 @@ public class GameController implements IGameLog {
             generateInitialBoard();
         }
     }
+
 
 
     private int countEmptyCells() {
